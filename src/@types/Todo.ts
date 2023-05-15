@@ -1,4 +1,4 @@
-import { SetStateAction } from "react";
+import { SetStateAction } from 'react';
 
 export interface TodoProp {
   title: string;

@@ -25,8 +25,7 @@ const TodoItem = ({ id, title, setTodos }: any) => {
       <span>{title}</span>
       <div className="item-option">
         {!isLoading ? (
-          // eslint-disable-next-line react/button-has-type
-          <button onClick={() => handleRemoveTodo()}>
+          <button type="button" onClick={() => handleRemoveTodo()}>
             <FaTrash className="btn-trash" />
           </button>
         ) : (

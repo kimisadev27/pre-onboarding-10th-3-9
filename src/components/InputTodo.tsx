@@ -3,9 +3,15 @@ import { useCallback, useEffect, useState } from 'react';
 
 import { createTodo } from '../api/todo';
 import useFocus from '../hooks/useFocus';
+import { useSearchDispatch, useSearchState } from '../contexts/SearchContext';
+import { SearchInputProps } from '../@types/Search';
 
-const InputTodo = ({ setTodos }: any) => {
-  const [inputText, setInputText] = useState('');
+import './styles/search.css';
+
+const InputTodo = ({ setTodos }: any, { onFocus }: SearchInputProps) => {
+  // const [inputText, setInputText] = useState("");
+  const { inputText } = useSearchState();
+  const { changeInputText } = useSearchDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const { ref, setFocus } = useFocus();
 
@@ -35,7 +41,7 @@ const InputTodo = ({ setTodos }: any) => {
         console.error(error);
         alert('Something went wrong.');
       } finally {
-        setInputText('');
+        changeInputText('');
         setIsLoading(false);
       }
     },
@@ -49,8 +55,11 @@ const InputTodo = ({ setTodos }: any) => {
         placeholder="Add new todo..."
         ref={ref}
         value={inputText}
-        onChange={(e) => setInputText(e.target.value)}
+        onChange={(e) => {
+          changeInputText(e.target.value);
+        }}
         disabled={isLoading}
+        onFocus={onFocus}
       />
       {!isLoading ? (
         <button className="input-submit" type="submit">
