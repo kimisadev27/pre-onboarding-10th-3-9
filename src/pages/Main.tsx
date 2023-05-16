@@ -3,47 +3,52 @@ import { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import InputTodo from '../components/InputTodo';
 import TodoList from '../components/TodoList';
-import Dropdown from '../components/Dropdown';
 
-import { getTodoList } from '../api/todo';
-import { doSearch } from '../api/search';
-import { useSearchDispatch, useSearchState } from '../contexts/SearchContext';
-import useBoolean from '../hooks/useBoolean';
-import useClickOutside from '../hooks/useClickOutside';
+import { createTodo, getTodoList } from '../api/todo';
+import { TodoProp } from '../@types/Todo';
 
 const Main = () => {
-  const {
-    value: isDropdownOpen,
-    setFalse: closeDropdown,
-    setTrue: openDropdown,
-  } = useBoolean(false);
-
-  const {
-    value: isDropdownScroll,
-    setFalse: resetScroll,
-    setTrue: reSearchAndResetScroll,
-  } = useBoolean(false);
-
-  const { ref } = useClickOutside<HTMLDivElement>(closeDropdown);
-
-  const [todoListData, setTodoListData] = useState([]);
+  const [todoListData, setTodoListData] = useState<TodoProp[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
       const { data } = await getTodoList();
       setTodoListData(data || []);
-      // setSearchList([]);
     })();
+    // changeSearchResult('');
   }, []);
+
+  const addTodo = async (text: string) => {
+    try {
+      setIsLoading(true);
+      const trimmed = text.trim();
+      if (!trimmed) {
+        return alert('Please write something');
+      }
+
+      const newItem = { title: trimmed };
+      const { data } = await createTodo(newItem);
+      if (data) {
+        return setTodoListData((prev) => [...prev, data]);
+      }
+
+      return null;
+    } catch (error) {
+      console.error(error);
+      return alert('Something went wrong.');
+    } finally {
+      setIsLoading(false);
+    }
+
+    return undefined;
+  };
 
   return (
     <div className="container">
       <div className="inner">
         <Header />
-        <div className="searchBar">
-          <InputTodo setTodos={setTodoListData} />
-          <Dropdown isOpen={isDropdownOpen} isScrollEnd={isDropdownScroll} />
-        </div>
+        <InputTodo addTodo={addTodo} isLoading={isLoading} />
         <TodoList todos={todoListData} setTodos={setTodoListData} />
       </div>
     </div>

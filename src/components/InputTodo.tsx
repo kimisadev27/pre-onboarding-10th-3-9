@@ -1,72 +1,41 @@
-import { FaPlusCircle, FaSpinner } from 'react-icons/fa';
-import { useCallback, useEffect, useState } from 'react';
-
-import { createTodo } from '../api/todo';
-import useFocus from '../hooks/useFocus';
 import { useSearchDispatch, useSearchState } from '../contexts/SearchContext';
-import { SearchInputProps } from '../@types/Search';
 
 import './styles/search.css';
+import Dropdown from './Dropdown';
+import useBoolean from '../hooks/useBoolean';
+import { InputTodoProp } from '../@types/Todo';
 
-const InputTodo = ({ setTodos }: any, { onFocus }: SearchInputProps) => {
-  // const [inputText, setInputText] = useState("");
-  const { inputText } = useSearchState();
+const InputTodo = ({ addTodo, isLoading }: InputTodoProp) => {
+  const { inputText, searchResult } = useSearchState();
   const { changeInputText } = useSearchDispatch();
-  const [isLoading, setIsLoading] = useState(false);
-  const { ref, setFocus } = useFocus();
 
-  useEffect(() => {
-    setFocus();
-  }, [setFocus]);
+  const { value: isDropdownOpen, setTrue: openDropdown } = useBoolean(false);
 
-  const handleSubmit = useCallback(
-    // eslint-disable-next-line consistent-return
-    async (e: React.FormEvent) => {
-      try {
-        e.preventDefault();
-        setIsLoading(true);
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    changeInputText('');
+    addTodo(inputText);
+  };
 
-        const trimmed = inputText.trim();
-        if (!trimmed) {
-          return alert('Please write something');
-        }
-
-        const newItem = { title: trimmed };
-        const { data } = await createTodo(newItem);
-
-        if (data) {
-          return setTodos((prev: []) => (prev ? [...prev, data] : [data]));
-        }
-      } catch (error) {
-        console.error(error);
-        alert('Something went wrong.');
-      } finally {
-        changeInputText('');
-        setIsLoading(false);
-      }
-    },
-    [inputText, setTodos],
-  );
+  const onClickResult = (clickedResult: string) => {
+    changeInputText('');
+    addTodo(clickedResult);
+  };
 
   return (
-    <form className="form-container" onSubmit={handleSubmit}>
+    <form onSubmit={onSubmit}>
       <input
-        className="input-text"
+        className="default"
         placeholder="Add new todo..."
-        ref={ref}
         value={inputText}
         onChange={(e) => {
           changeInputText(e.target.value);
         }}
         disabled={isLoading}
-        onFocus={onFocus}
+        onFocus={openDropdown}
       />
-      {!isLoading ? (
-        <button className="input-submit" type="submit">
-          <FaPlusCircle className="btn-plus" />
-        </button>
-      ) : (
-        <FaSpinner className="spinner" />
+      {isDropdownOpen && searchResult?.result.length !== 0 && (
+        <Dropdown onClickResult={onClickResult} />
       )}
     </form>
   );

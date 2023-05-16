@@ -19,10 +19,15 @@ export interface Suggestion {
 }
 
 export interface DropdownProps {
-  isOpen: boolean;
-  isScrollEnd: boolean;
+  onClickResult: (text: string) => void;
 }
 
 export interface SearchInputProps {
   onFocus: React.FocusEventHandler<HTMLInputElement>;
+}
+
+export interface DropdownItemProps {
+  index: number;
+  children: string;
+  onClickResult: (text: string) => void;
 }

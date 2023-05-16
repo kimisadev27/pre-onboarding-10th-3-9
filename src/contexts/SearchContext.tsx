@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import { doSearch } from '../api/search';
 import { SearchResultProp } from '../@types/Search';
 import useDebounce from '../hooks/useDebounce';
 import {
@@ -22,6 +21,7 @@ interface Dispatch {
   changeInputText: (newKeyword: string) => void;
   hoverAction: (itemIndex: number) => void;
   inactivate: () => void;
+  changeSearchResult: (keyword: string) => void;
 }
 
 const SearchContext = createContext<SearchState | null>(null);
@@ -37,6 +37,7 @@ export const SearchContextProvider = ({
   const [searchResult, search] = useSearch(cache);
   const [inputText, setInputText] = useState('');
   const [activeIndex, setActiveIndex] = useState(START_ACTIVE_INDEX);
+
   const debouncedKeyword = useDebounce<string>(inputText.trim(), DEBOUNCE_DELAY_IN_MS);
   const maxIndex = searchResult?.result
     ? searchResult.result.length - 1
@@ -49,6 +50,10 @@ export const SearchContextProvider = ({
   const changeInputText = (keyword: string) => {
     setInputText(keyword);
     setActiveIndex(START_ACTIVE_INDEX);
+  };
+
+  const changeSearchResult = (keyword: string) => {
+    search(keyword);
   };
 
   const hoverAction = (itemIndex: number) => setActiveIndex(itemIndex);
@@ -92,7 +97,13 @@ export const SearchContextProvider = ({
   return (
     <SearchContext.Provider value={{ inputText, activeIndex, searchResult }}>
       <SearchDispatchContext.Provider
-        value={{ controlKeyboard, changeInputText, hoverAction, inactivate }}
+        value={{
+          controlKeyboard,
+          changeInputText,
+          hoverAction,
+          inactivate,
+          changeSearchResult,
+        }}
       >
         {children}
       </SearchDispatchContext.Provider>

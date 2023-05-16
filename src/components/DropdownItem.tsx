@@ -2,22 +2,11 @@
 /* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
 import { useSearchDispatch, useSearchState } from '../contexts/SearchContext';
 import './styles/dropdown.css';
+import { DropdownItemProps } from '../@types/Search';
 
-interface DropdownItemProps {
-  index: number;
-  children: string;
-}
-
-const DropdownItem = ({ index, children: result }: DropdownItemProps) => {
+const DropdownItem = ({ index, children: result, onClickResult }: DropdownItemProps) => {
   const { inputText, activeIndex } = useSearchState();
-  const { hoverAction, inactivate, changeInputText } = useSearchDispatch();
-
-  const onMouseEnter = () => hoverAction(index);
-  const onClick = () => {
-    hoverAction(index);
-    // changeInputText(result);
-    // Add TodoList
-  };
+  const { inactivate } = useSearchDispatch();
 
   const keywordRegex = new RegExp(`(${inputText})`, 'gi');
   const texts = result.split(keywordRegex);
@@ -26,9 +15,8 @@ const DropdownItem = ({ index, children: result }: DropdownItemProps) => {
     <div>
       <li
         className={index === activeIndex ? 'DropdownItem active' : 'DropdownItem'}
-        // onMouseEnter={onMouseEnter}
         onMouseLeave={inactivate}
-        onClick={onClick}
+        onClick={() => onClickResult(result)}
       >
         {texts.map((text, idx) => {
           const key = text + idx;
@@ -47,28 +35,3 @@ const DropdownItem = ({ index, children: result }: DropdownItemProps) => {
 };
 
 export default DropdownItem;
-
-// if (keywordRegex.test(text)) {
-//   return (
-//     <div className="keywordText" key={key}>
-//       {text}
-//     </div>
-//   );
-// }
-// return <div key={key}>{text}</div>;
-
-// {texts.map((text, idx) => {
-//   const key = text + idx;
-//   const hightLightText = text.split(keywordRegex);
-//   {
-//     hightLightText.map((hlText, index) => {
-//       hlText.toLowerCase() === inputText.toLowerCase() ? (
-//         <span key={index} className="hightlight">
-//           {hlText}
-//         </span>
-//       ) : (
-//         hlText
-//       );
-//     });
-//   }
-// })}
