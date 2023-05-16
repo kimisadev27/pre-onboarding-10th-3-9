@@ -16,7 +16,6 @@ const Main = () => {
       const { data } = await getTodoList();
       setTodoListData(data || []);
     })();
-    // changeSearchResult('');
   }, []);
 
   const addTodo = async (text: string) => {

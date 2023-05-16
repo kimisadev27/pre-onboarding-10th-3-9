@@ -13,17 +13,8 @@ export interface SearchResultProp {
   total: number;
 }
 
-export interface Suggestion {
-  name: string;
-  id: number;
-}
-
 export interface DropdownProps {
   onClickResult: (text: string) => void;
-}
-
-export interface SearchInputProps {
-  onFocus: React.FocusEventHandler<HTMLInputElement>;
 }
 
 export interface DropdownItemProps {
